@@ -23,7 +23,6 @@
 
 ---
 
-![Clarity dual audio](docs/ui-audio.png)
 
 ## Why Clarity
 
@@ -44,7 +43,6 @@ Screen recorders today are either heavy (OBS's learning curve), expensive (Scree
 | ⏱ **Details** | 3-2-1 countdown (optional), pause/resume, sleep prevention, save prompt on accidental close |
 | 🇨🇳 **Chinese-first UI** | Designed for Chinese users, works out of the box |
 
-![Live preview](docs/ui-preview.png)
 
 ## 📦 Install
 
@@ -69,7 +67,6 @@ Requirements: Windows 10 19041+ / Windows 11, and [ffmpeg](https://www.gyan.dev/
 2. **Toggle audio** — system audio and/or microphone; if the meter moves, you're recording it;
 3. **Hit record** — 3-second countdown, then record; stop and save when done.
 
-![Save view](docs/ui-save.png)
 
 ## 🧪 Quality
 
