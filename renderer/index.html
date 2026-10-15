@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self' blob:; style-src 'self'" />
+  <title>Clarity</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="2" y="2" width="60" height="60" rx="15" fill="#18181b"/>
+        <path d="M21 28v-6a2.5 2.5 0 0 1 2.5-2.5H29" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
+        <path d="M43 28v-6a2.5 2.5 0 0 0-2.5-2.5H35" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
+        <path d="M21 36v6a2.5 2.5 0 0 0 2.5 2.5H29" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
+        <path d="M43 36v6a2.5 2.5 0 0 1-2.5 2.5H35" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
+        <circle cx="32" cy="32" r="7" fill="#dc2626"/>
+      </svg>
+      <div class="brand"><span class="brand-name">Clarity</span></div>
+    </header>
+
+    <!-- ========== 准备视图 ========== -->
+    <main id="view-setup" class="view">
+      <div class="setup-grid">
+        <div class="setup-left">
+          <section class="card card-source">
+            <div class="card-head">
+              <h2>画面</h2>
+              <span class="badge plain" id="source-kind">未选择</span>
+              <span class="spacer"></span>
+              <button class="btn small" id="btn-pick">选择画面</button>
+            </div>
+            <div class="source-preview" id="source-preview" title="点击放大预览">
+              <div class="placeholder" id="source-empty">选择要录制的屏幕或窗口</div>
+              <video id="preview-video" autoplay muted playsinline hidden></video>
+            </div>
+            <div class="source-name" id="source-name"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-head"><h2>保存</h2></div>
+            <div class="save-row">
+              <span class="save-label">分辨率</span>
+              <div class="seg" id="seg-res">
+                <button data-v="original">原始</button>
+                <button data-v="1080p">1080p</button>
+                <button data-v="720p">720p</button>
+              </div>
+            </div>
+            <div class="save-row">
+              <span class="save-label">位置</span>
+              <code class="path" id="save-dir"></code>
+              <button class="btn small" id="btn-browse">浏览…</button>
+              <button class="btn small" id="btn-open-dir">打开</button>
+            </div>
+            <div class="save-row" id="row-last" hidden>
+              <span class="save-label">上次</span>
+              <code class="path" id="last-name"></code>
+              <button class="btn small" id="btn-last-open">打开</button>
+            </div>
+            <label class="check-row">
+              <input type="checkbox" id="toggle-openfolder" />
+              <span>保存完成后打开所在文件夹</span>
+            </label>
+          </section>
+        </div>
+
+        <div class="setup-side">
+          <section class="card">
+            <div class="card-head">
+              <h2>声音</h2>
+            </div>
+            <div class="audio-stack">
+              <div class="audio-card">
+                <div class="audio-row">
+                  <div class="audio-copy">
+                    <div class="audio-title">系统声音 <span class="audio-sub">电脑里播的声音</span></div>
+                    <div class="audio-desc">视频、会议、音乐、提示音</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggle-system" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="meter" id="meter-system"></div>
+                <div class="audio-hint" id="hint-system"></div>
+              </div>
+
+              <div class="audio-card">
+                <div class="audio-row">
+                  <div class="audio-copy">
+                    <div class="audio-title">麦克风 <span class="audio-sub">你自己说的话</span></div>
+                    <div class="audio-desc">人声、解说、在线对话</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggle-mic" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="meter" id="meter-mic"></div>
+                <select id="mic-device" class="input mic-device" hidden></select>
+                <div class="audio-hint" id="hint-mic"></div>
+              </div>
+              <div class="combo-hint" id="audio-combo">开哪个就录哪个的声音；全关则录制无声视频</div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head"><h2>录制</h2></div>
+            <div class="save-row">
+              <span class="save-label">倒计时</span>
+              <div class="seg" id="seg-countdown">
+                <button data-v="0">关</button>
+                <button data-v="3">3 秒</button>
+                <button data-v="5">5 秒</button>
+                <button data-v="10">10 秒</button>
+              </div>
+            </div>
+            <label class="check-row">
+              <input type="checkbox" id="toggle-autohide" />
+              <span>开始后收起为迷你悬浮条，主窗口不进画面</span>
+            </label>
+          </section>
+
+<section class="card card-recent" id="card-recent" hidden>
+        <div class="card-head">
+          <h2>最近</h2>
+          <span class="hint-inline">保存在此目录下的最近录像</span>
+          <span class="spacer"></span>
+          <button class="btn small" id="btn-recent-dir">打开文件夹</button>
+        </div>
+        <div id="recent-list"></div>
+      </section>
+        </div>
+      </div>
+
+
+      <div class="record-bar">
+        <div class="record-meta" id="setup-meta">尚未选择画面</div>
+        <button class="btn primary big" id="btn-record" disabled>● 开始录制</button>
+      </div>
+    </main>
+
+    <!-- ========== 录制视图 ========== -->
+    <main id="view-recording" class="view" hidden>
+      <div class="rec-center">
+        <span class="badge state-rec" id="rec-badge">录制中</span>
+        <div class="timer" id="rec-timer">00:00</div>
+        <div class="rec-size" id="rec-size">已录约 0 MB</div>
+        <div class="rec-monitor-wrap"><video id="rec-monitor" autoplay muted playsinline></video></div>
+        <div class="rec-actions">
+          <button class="btn" id="btn-pause">暂停</button>
+          <button class="btn primary" id="btn-stop">停止并保存</button>
+        </div>
+        <div class="rec-note">最小化不会中断录制</div>
+        <button class="btn small" id="btn-minibar">收起为迷你条</button>
+      </div>
+    </main>
+
+    <!-- ========== 保存视图 ========== -->
+    <main id="view-save" class="view" hidden>
+      <div class="save-head">
+        <span class="badge state-ok">录制完成</span>
+        <div class="save-facts" id="save-facts"></div>
+      </div>
+
+      <section class="card">
+        <div class="card-head"><h2>保存</h2></div>
+        <div class="save-summary" id="save-summary"></div>
+        <div class="field">
+          <label>文件名</label>
+          <input class="input" id="save-name" spellcheck="false" />
+        </div>
+        <div class="save-actions">
+          <button class="btn danger-ghost" id="btn-discard">丢弃这段录制</button>
+          <span class="spacer"></span>
+          <button class="btn" id="btn-save-home">保存并返回主页</button>
+          <button class="btn primary" id="btn-save">保存为 MP4</button>
+        </div>
+        <div class="save-progress" id="save-progress" hidden>
+          <div class="bar"><i id="save-bar"></i></div>
+          <div class="pct" id="save-pct">转码中 0%</div>
+        </div>
+        <div class="save-done" id="save-done" hidden>
+          <div class="done-msg" id="done-msg"></div>
+          <div class="done-actions">
+            <button class="btn" id="btn-copy-path">复制路径</button>
+            <button class="btn" id="btn-reveal">打开所在文件夹</button>
+            <button class="btn primary" id="btn-again">开始新录制</button>
+          </div>
+        </div>
+        <div class="field-error" id="save-error" hidden></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ========== 画面选择弹层 ========== -->
+  <div class="modal" id="picker-modal" hidden>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <div class="seg" id="picker-tabs">
+          <button data-v="screen">屏幕</button>
+          <button data-v="window">窗口</button>
+        </div>
+        <span class="spacer"></span>
+        <button class="btn small" id="btn-refresh">刷新</button>
+        <button class="btn small" id="btn-close-picker">关闭</button>
+      </div>
+      <div class="picker-grid" id="picker-grid"></div>
+      <div class="picker-empty" id="picker-empty" hidden>没有可选的窗口——先开几个窗口再点「刷新」</div>
+    </div>
+  </div>
+
+  <!-- ========== 倒计时 ========== -->
+  <div class="countdown" id="countdown" hidden>
+    <div class="countdown-num" id="countdown-num">3</div>
+    <button class="btn small" id="btn-countdown-cancel">取消</button>
+  </div>
+
+  <!-- ========== 应用内对话框（替代原生 confirm/alert：原生会无焦点阻塞渲染进程） ========== -->
+  <div class="modal" id="dialog-modal" hidden>
+    <div class="modal-panel dialog-panel">
+      <div class="dialog-msg" id="dialog-msg"></div>
+      <div class="dialog-actions">
+        <button class="btn" id="dialog-cancel">取消</button>
+        <button class="btn primary" id="dialog-ok">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 预览放大灯箱 ========== -->
+  <div class="modal" id="lightbox" hidden>
+    <div class="lightbox-inner">
+      <video id="lightbox-video" autoplay muted playsinline></video>
+      <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <script src="capture.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

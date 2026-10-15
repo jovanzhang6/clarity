@@ -1,0 +1,21 @@
+appId: com.clarity.recorder
+productName: Clarity
+directories:
+  output: dist
+  buildResources: assets
+files:
+  - main/**
+  - renderer/**
+  - assets/**
+  - package.json
+win:
+  icon: assets/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: true
+  perMachine: false
+  artifactName: Clarity-${version}-Setup.${ext}
+  deleteAppDataOnUninstall: false

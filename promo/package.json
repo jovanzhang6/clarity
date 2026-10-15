@@ -1,0 +1,16 @@
+{
+  "name": "clarity-promo",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Clarity 宣传片 —— Remotion 逐帧渲染",
+  "scripts": {
+    "render": "remotion render src/index.ts ClarityPromo ../out/promo.mp4 --codec=h264",
+    "still": "remotion still src/index.ts ClarityPromo ../out/promo-still.png"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.0"
+  }
+}

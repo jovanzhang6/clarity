@@ -1,0 +1,10 @@
+node_modules/
+dist/
+shots/
+selftest-output*.mp4
+selftest-frame.png
+selftest-result.json
+shot-*.png
+*.log
+.DS_Store
+demo-frames/

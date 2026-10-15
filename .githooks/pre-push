@@ -1,0 +1,11 @@
+#!/bin/sh
+# pre-push：推送前强制跑单元测试，红了就拦下（防止 CI 失败邮件轰炸）
+echo "[pre-push] running unit tests before push..."
+npm test --silent
+code=$?
+if [ $code -ne 0 ]; then
+  echo "[pre-push] tests FAILED — push blocked. 先修测试再推。"
+  exit 1
+fi
+echo "[pre-push] tests green, pushing."
+exit 0

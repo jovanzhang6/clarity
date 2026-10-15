@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'" />
+  <title>Clarity · 自检</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-name">Clarity</span><span class="brand-sub">端到端自检</span></div>
+    </header>
+    <main class="view">
+      <section class="card">
+        <div class="card-head">
+          <h2>采集 → 落盘 → 转码 → 校验</h2>
+          <span class="spacer"></span>
+          <span class="badge plain" id="st-status">运行中…</span>
+        </div>
+        <div class="selftest-list" id="st-list"></div>
+      </section>
+      <div class="selftest-note">此窗口会真实录制屏幕 5 秒并转码，产物在项目目录：selftest-output.mp4 / selftest-frame.png / selftest-result.json</div>
+    </main>
+  </div>
+  <script src="capture.js"></script>
+  <script src="selftest.js"></script>
+</body>
+</html>
