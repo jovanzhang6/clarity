@@ -148,7 +148,7 @@ app.whenReady().then(async () => {
     displaySourceRequest = { id: String(id || ''), at: Date.now() };
   });
   // 迷你条最小化：隐藏悬浮条；Alt+Shift+C 全局呼出/隐藏（仅录制中生效）
-  ipcMain.on('mini:hide', () => { miniWin?.hide(); });
+  ipcMain.handle('mini:hide', () => { miniWin?.hide(); });
   globalShortcut.register('Alt+Shift+C', () => {
     if (!recordingFlag) return;
     if (miniWin && miniWin.isVisible()) miniWin.hide();
