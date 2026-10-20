@@ -2,20 +2,16 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self' blob:; style-src 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'" />
   <title>Clarity</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="app">
     <header class="topbar">
-      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
-        <rect x="2" y="2" width="60" height="60" rx="15" fill="#18181b"/>
-        <path d="M21 28v-6a2.5 2.5 0 0 1 2.5-2.5H29" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
-        <path d="M43 28v-6a2.5 2.5 0 0 0-2.5-2.5H35" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
-        <path d="M21 36v6a2.5 2.5 0 0 0 2.5 2.5H29" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
-        <path d="M43 36v6a2.5 2.5 0 0 1-2.5 2.5H35" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
-        <circle cx="32" cy="32" r="7" fill="#dc2626"/>
+      <svg class="logo" viewBox="0 0 240 240" aria-hidden="true">
+        <rect x="4" y="4" width="232" height="232" rx="52" fill="#18181b"/>
+        <circle cx="120" cy="120" r="30" fill="#dc2626"/>
       </svg>
       <div class="brand"><span class="brand-name">Clarity</span></div>
     </header>
@@ -31,7 +27,7 @@
               <span class="spacer"></span>
               <button class="btn small" id="btn-pick">选择画面</button>
             </div>
-            <div class="source-preview" id="source-preview" title="点击放大预览">
+            <div class="source-preview" id="source-preview" title="点击放大实时预览">
               <div class="placeholder" id="source-empty">选择要录制的屏幕或窗口</div>
               <video id="preview-video" autoplay muted playsinline hidden></video>
             </div>
@@ -107,36 +103,30 @@
           </section>
 
           <section class="card">
-            <div class="card-head"><h2>录制</h2></div>
-            <div class="save-row">
-              <span class="save-label">倒计时</span>
-              <div class="seg" id="seg-countdown">
-                <button data-v="0">关</button>
-                <button data-v="3">3 秒</button>
-                <button data-v="5">5 秒</button>
-                <button data-v="10">10 秒</button>
-              </div>
+            <div class="card-head"><h2>最近</h2>
+              <span class="hint-inline">保存在此目录下的最近录像</span>
+              <span class="spacer"></span>
+              <button class="btn small" id="btn-recent-dir">打开文件夹</button>
             </div>
-            <label class="check-row">
-              <input type="checkbox" id="toggle-autohide" />
-              <span>开始后收起为迷你悬浮条，主窗口不进画面</span>
-            </label>
+            <div id="recent-list"></div>
           </section>
-
-<section class="card card-recent" id="card-recent" hidden>
-        <div class="card-head">
-          <h2>最近</h2>
-          <span class="hint-inline">保存在此目录下的最近录像</span>
-          <span class="spacer"></span>
-          <button class="btn small" id="btn-recent-dir">打开文件夹</button>
-        </div>
-        <div id="recent-list"></div>
-      </section>
         </div>
       </div>
 
-
       <div class="record-bar">
+        <div class="record-controls">
+          <span class="save-label">倒计时</span>
+          <div class="seg seg-sm" id="seg-countdown">
+            <button data-v="0">关</button>
+            <button data-v="3">3 秒</button>
+            <button data-v="5">5 秒</button>
+            <button data-v="10">10 秒</button>
+          </div>
+          <label class="check-row" title="开始后主窗口收起为迷你悬浮条，不进画面">
+            <input type="checkbox" id="toggle-autohide" />
+            <span>收起为迷你条</span>
+          </label>
+        </div>
         <div class="record-meta" id="setup-meta">尚未选择画面</div>
         <button class="btn primary big" id="btn-record" disabled>● 开始录制</button>
       </div>
@@ -153,7 +143,7 @@
           <button class="btn" id="btn-pause">暂停</button>
           <button class="btn primary" id="btn-stop">停止并保存</button>
         </div>
-        <div class="rec-note">最小化不会中断录制</div>
+        <div class="rec-note">最小化不会中断录制 · 迷你条已捕获排除，不会录入画面</div>
         <button class="btn small" id="btn-minibar">收起为迷你条</button>
       </div>
     </main>
@@ -161,6 +151,7 @@
     <!-- ========== 保存视图 ========== -->
     <main id="view-save" class="view" hidden>
       <div class="save-head">
+        
         <span class="badge state-ok">录制完成</span>
         <div class="save-facts" id="save-facts"></div>
       </div>
@@ -193,51 +184,50 @@
         <div class="field-error" id="save-error" hidden></div>
       </section>
     </main>
-  </div>
 
-  <!-- ========== 画面选择弹层 ========== -->
-  <div class="modal" id="picker-modal" hidden>
-    <div class="modal-panel">
-      <div class="modal-head">
-        <div class="seg" id="picker-tabs">
-          <button data-v="screen">屏幕</button>
-          <button data-v="window">窗口</button>
+    <!-- ========== 画面选择弹层 ========== -->
+    <div class="modal" id="picker-modal" hidden>
+      <div class="modal-panel">
+        <div class="modal-head">
+          <div class="seg" id="picker-tabs">
+            <button data-v="screen">屏幕</button>
+            <button data-v="window">窗口</button>
+          </div>
+          <span class="spacer"></span>
+          <button class="btn small" id="btn-refresh">刷新</button>
+          <button class="btn small" id="btn-close-picker">关闭</button>
         </div>
-        <span class="spacer"></span>
-        <button class="btn small" id="btn-refresh">刷新</button>
-        <button class="btn small" id="btn-close-picker">关闭</button>
-      </div>
-      <div class="picker-grid" id="picker-grid"></div>
-      <div class="picker-empty" id="picker-empty" hidden>没有可选的窗口——先开几个窗口再点「刷新」</div>
-    </div>
-  </div>
-
-  <!-- ========== 倒计时 ========== -->
-  <div class="countdown" id="countdown" hidden>
-    <div class="countdown-num" id="countdown-num">3</div>
-    <button class="btn small" id="btn-countdown-cancel">取消</button>
-  </div>
-
-  <!-- ========== 应用内对话框（替代原生 confirm/alert：原生会无焦点阻塞渲染进程） ========== -->
-  <div class="modal" id="dialog-modal" hidden>
-    <div class="modal-panel dialog-panel">
-      <div class="dialog-msg" id="dialog-msg"></div>
-      <div class="dialog-actions">
-        <button class="btn" id="dialog-cancel">取消</button>
-        <button class="btn primary" id="dialog-ok">确定</button>
+        <div class="picker-grid" id="picker-grid"></div>
+        <div class="picker-empty" id="picker-empty" hidden>没有可选的窗口——先开几个窗口再点「刷新」</div>
       </div>
     </div>
-  </div>
 
-  <!-- ========== 预览放大灯箱 ========== -->
-  <div class="modal" id="lightbox" hidden>
-    <div class="lightbox-inner">
-      <video id="lightbox-video" autoplay muted playsinline></video>
-      <div class="lightbox-caption" id="lightbox-caption"></div>
+    <!-- ========== 倒计时 ========== -->
+    <div class="countdown" id="countdown" hidden>
+      <div class="countdown-num" id="countdown-num">3</div>
+      <button class="btn small" id="btn-countdown-cancel">取消</button>
     </div>
-  </div>
 
-  <script src="capture.js"></script>
-  <script src="app.js"></script>
+    <!-- ========== 应用内对话框 ========== -->
+    <div class="modal" id="dialog-modal" hidden>
+      <div class="modal-panel dialog-panel">
+        <div class="dialog-msg" id="dialog-msg"></div>
+        <div class="dialog-actions">
+          <button class="btn" id="dialog-cancel">取消</button>
+          <button class="btn primary" id="dialog-ok">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 预览放大灯箱 ========== -->
+    <div class="modal" id="lightbox" hidden>
+      <div class="lightbox-inner">
+        <video id="lightbox-video" autoplay muted playsinline></video>
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+      </div>
+    </div>
+
+    <script src="capture.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

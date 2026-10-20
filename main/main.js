@@ -54,9 +54,9 @@ const ICON = path.join(__dirname, '..', 'assets', 'icon.ico');
 function createMain() {
   mainWin = new BrowserWindow({
     width: 1000,
-    height: 680,
+    height: 704,
     minWidth: 880,
-    minHeight: 580,
+    minHeight: 600,
     title: 'Clarity',
     icon: ICON,
     backgroundColor: '#f6f6f7',

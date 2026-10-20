@@ -37,7 +37,7 @@ body {
 #app { height: 100vh; margin: 0 auto; padding: 0 22px 8px; display: flex; flex-direction: column; }
 
 /* ---------- 顶栏 ---------- */
-.topbar { padding: 4px 0 5px; display: flex; align-items: center; gap: 10px; }
+.topbar { padding: 2px 0 4px; display: flex; align-items: center; gap: 10px; }
 .logo { width: 26px; height: 26px; flex: none; }
 .brand-name { font-size: 17px; font-weight: 700; letter-spacing: 0.02em; }
 .brand-sub { margin-left: 8px; font-size: 12px; color: var(--faint); }
@@ -116,12 +116,12 @@ body {
 .source-name { margin-top: 5px; font-size: 12px; color: var(--muted); min-height: 18px; word-break: break-all; }
 
 /* ---------- 声音卡片（紧凑单列） ---------- */
-.audio-stack { display: flex; flex-direction: column; gap: 8px; }
+.audio-stack { display: flex; flex-direction: column; gap: 6px; }
 
 .audio-card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 8px 10px;
+  padding: 7px 10px;
   display: flex; flex-direction: column; gap: 5px;
 }
 .audio-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -169,8 +169,8 @@ body {
 
 /* ---------- 底部录制条 ---------- */
 .record-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 4px 0;
+  display: flex; align-items: center; gap: 16px;
+  padding: 8px 4px 0;
   margin-top: auto;
 }
 .record-meta { font-size: 12px; color: var(--faint); }
@@ -398,3 +398,11 @@ body.mini .mini-icon .ic-play { display: none; }
 body.mini .mini-icon.paused .ic-pause { display: none; }
 body.mini .mini-icon.paused .ic-play { display: block; }
 body.mini .mini-icon .mute-line { stroke: var(--red); }
+
+/* ---------- 录制条控件（倒计时/迷你条开关内联） ---------- */
+.record-bar { display: flex; align-items: center; gap: 16px; }
+.record-controls { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.record-controls .save-label { width: auto; }
+.seg-sm button { padding: 3px 12px; font-size: 12px; }
+.record-bar .check-row { padding: 0; white-space: nowrap; }
+.record-bar .record-meta { flex: 1; text-align: right; }
