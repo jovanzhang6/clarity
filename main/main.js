@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell, desktopCapturer, powerSaveBlocker, Menu, session, globalShortcut } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, desktopCapturer, powerSaveBlocker, Menu, session, globalShortcut, Tray } = require('electron');
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -11,10 +11,40 @@ const isSelftest = process.argv.includes('--selftest');
 
 let mainWin = null;
 let miniWin = null;
+let tray = null;
 let writer = null;
 let recordingFlag = false;
 let forceQuitting = false;
 let powerId = null;
+
+// 托盘：常驻。左键 = 智能恢复（录制中呼出迷你条，否则显示主窗口）；右键 = 菜单
+function createTray() {
+  try {
+    tray = new Tray(ICON);
+    tray.setToolTip('Clarity');
+    const rebuildMenu = () => Menu.buildFromTemplate([
+      { label: '显示主窗口', click: () => { miniWin?.hide(); mainWin?.show(); mainWin?.focus(); } },
+      ...(recordingFlag ? [{ label: '显示迷你条', click: () => { mainWin?.hide(); if (!miniWin) createMini(); miniWin.showInactive(); } }] : []),
+      { type: 'separator' },
+      { label: '退出 Clarity', click: () => { forceQuitting = true; app.quit(); } },
+    ]);
+    tray.setContextMenu(rebuildMenu());
+    tray.on('click', () => {
+      if (recordingFlag) {
+        mainWin?.hide();
+        if (!miniWin) createMini();
+        miniWin.showInactive();
+      } else {
+        miniWin?.hide();
+        mainWin?.show();
+        mainWin?.focus();
+      }
+    });
+  } catch (err) {
+    console.error('[clarity] tray create failed:', err.message);
+    tray = null;
+  }
+}
 
 app.setName('clarity');
 Menu.setApplicationMenu(null);
@@ -173,6 +203,7 @@ app.whenReady().then(async () => {
   cleanupOrphans(cfg.saveDir).catch(() => {});
 
   createMain();
+  createTray(); // 托盘兜底：迷你条最小化后可从这里恢复
   if (isSelftest) createMini(); // 自检也验证迷你条窗口能正常创建
 
   app.on('activate', () => {
