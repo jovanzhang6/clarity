@@ -1,7 +1,7 @@
 {
   "name": "clarity",
   "productName": "Clarity",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Clarity —— 极简录屏：画面/窗口选择、实时预览、系统声音与麦克风独立开关带实时音量表、可选分辨率保存到指定位置",
   "private": true,
   "main": "main/main.js",

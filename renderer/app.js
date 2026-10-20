@@ -446,6 +446,18 @@ async function startRecording() {
 
   $('btn-record').disabled = true;
   closePicker();
+
+  // 倒计时一结束立即离场：迷你条已捕获排除，先出现不会录入画面。
+  // 采集初始化（1-3s）在离场之后进行，迷你条先显示“启动中”呼吸态。
+  if ($('toggle-autohide').checked) {
+    window.api.miniShow();
+    window.api.miniTick({ recState: 'starting', elapsedMs: 0, sysOn: state.sysOn, micOn: state.micOn });
+  } else {
+    show('recording');
+    $('rec-badge').textContent = '启动中…';
+    $('rec-badge').className = 'badge state-paused';
+  }
+
   try {
     stopPreviewStream(); // 释放预览采集，录制换全分辨率通道
     stopSystemAudio(); // 系统声音表与录制各自重新采集
@@ -458,7 +470,6 @@ async function startRecording() {
     const vs = await window.clarityCapture.acquirePreview(state.source);
     const videoTrack = vs.getVideoTracks()[0];
     state._recStreams = [vs];
-    detachBranch('system'); // 旧的系统声音表分支退役，下面用纯音频流重建
 
     // 系统声音：独立纯音频 loopback（与预览互不干扰，支持录制中动态补采）
     if (state.sysOn) {
@@ -513,15 +524,18 @@ async function startRecording() {
     window.api.setRecordingFlag(true);
     log('record: recorder started, video', state.recSrcW + 'x' + state.recSrcH, 'audio =', state.recHasAudio);
 
+    // 徽章从“启动中”转正
+    $('rec-badge').textContent = '录制中';
+    $('rec-badge').className = 'badge state-rec';
+
     // 录制视图里放一路实时监视器，所见即所录
     const monitor = $('rec-monitor');
     if (monitor) { monitor.srcObject = new MediaStream([videoTrack]); monitor.play().catch(() => {}); }
 
-    show('recording');
     updateRecUI();
     state._timerId = setInterval(updateRecUI, 250);
 
-    if ($('toggle-autohide').checked) window.api.miniShow();
+    if ($('toggle-autohide').checked) window.api.miniShow(); // 已在离场时显示过，这里保底
   } catch (err) {
     // 采集阶段失败：清理干净回到准备态
     log('record: FAILED -', String(err.message || err));
@@ -533,6 +547,8 @@ async function startRecording() {
     window.api.setRecordingFlag(false);
     $('btn-record').disabled = !state.source;
     stopSystemAudio(); // 释放录制期回环（错误路径下可能已采集）
+    show('setup'); // 之前已提前切到录制视图，失败必须回到准备态
+    setMeta();
     startPreview(); // 回准备态，恢复实时预览
     if (state.sysOn) startSystemAudio();
     await uiAlert(err.message || String(err));

@@ -8,7 +8,8 @@ const fmt = (ms) => {
 let paused = false;
 window.api.onMiniTick(({ recState, elapsedMs, sysOn, micOn }) => {
   $('time').textContent = fmt(elapsedMs);
-  $('dot').className = 'mini-dot ' + (recState === 'paused' ? 'paused' : 'rec');
+  // starting = 采集初始化中（琥珀呼吸），正式录制 = 红色脉冲
+  $('dot').className = 'mini-dot ' + (recState === 'paused' ? 'paused' : recState === 'starting' ? 'starting' : 'rec');
   paused = recState === 'paused';
   $('b-pause').classList.toggle('paused', paused);
   // 图标状态：开=正常图标，关=图标变淡+红斜线（会议软件通用语汇）

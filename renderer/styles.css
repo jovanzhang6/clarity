@@ -406,3 +406,4 @@ body.mini .mini-icon .mute-line { stroke: var(--red); }
 .seg-sm button { padding: 3px 12px; font-size: 12px; }
 .record-bar .check-row { padding: 0; white-space: nowrap; }
 .record-bar .record-meta { flex: 1; text-align: right; }
+.mini-dot.starting { background: var(--warn-dot); animation: pulse 1.2s ease-in-out infinite; }
